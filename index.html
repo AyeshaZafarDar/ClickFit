@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Fit - Your Fitness Journey Starts Here</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Toast for error/status messages -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
+        <div id="statusToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="statusToastBody"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast for login success -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
+        <div id="loginToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="loginToastBody">
+                    <!-- Message will be set by JS -->
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast for logout success -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
+        <div id="logoutToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="logoutToastBody"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <span class="text-primary">Click</span><span class="text-light">Fit</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto justify-content-center align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#facts">Facts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#why">Why Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#journey">My Journey</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#programs">Programs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#stories">Stories</a>
+                    </li>
+                </ul>
+                <div class="d-flex ms-auto align-items-center d-none d-lg-flex" id="navbar-auth-buttons">
+                    <button class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#registerModal">
+                        Register
+                    </button>
+                    <button class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        Login
+                    </button>
+                </div>
+                <div id="navbar-user-info" class="d-flex align-items-center ms-3 d-none d-lg-flex"></div>
+                <!-- Auth buttons for small screens (centered) -->
+                <ul class="navbar-nav w-100 d-lg-none justify-content-center align-items-center flex-row gap-2 mb-2 mb-lg-0" id="navbar-auth-buttons-mobile">
+                    <li>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+                            Register
+                        </button>
+                    </li>
+                    <li>
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+                            Login
+                        </button>
+                    </li>
+                </ul>
+                <div id="navbar-user-info-mobile" class="d-flex align-items-center justify-content-center w-100 d-lg-none mb-2"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Registration Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <div class="w-100 text-center">
+                        <h5 class="modal-title">Create Your Account</h5>
+                        <p class="text-muted mb-0">Join our fitness community today</p>
+                    </div>
+                    <button type="button" class="btn-close position-absolute" style="right: 1rem; top: 1rem;" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm" class="needs-validation" novalidate>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="fullName" placeholder="Full Name" required>
+                            <label for="fullName">Full Name</label>
+                            <div class="invalid-feedback">Please enter your full name</div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" placeholder="Email address" required>
+                            <label for="email">Email address</label>
+                            <div class="invalid-feedback">Please enter a valid email</div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password" placeholder="Password" required>
+                            <label for="password">Password</label>
+                            <div class="invalid-feedback">Please enter a password</div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
+                            <label for="confirmPassword">Confirm Password</label>
+                            <div class="invalid-feedback">Passwords do not match</div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <select class="form-select" id="userType" required>
+                                <option value="">Select account type</option>
+                                <option value="user">User</option>
+                                <option value="trainer">Trainer</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                            <label for="userType">Account Type</label>
+                            <div class="invalid-feedback">Please select an account type</div>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" class="text-primary">Terms & Conditions</a>
+                            </label>
+                            <div class="invalid-feedback">You must agree to the terms</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-3">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Create Account
+                        </button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p class="mb-0">Already have an account? <a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <div class="w-100 text-center">
+                        <h5 class="modal-title">Welcome Back</h5>
+                        <p class="text-muted mb-0">Sign in to continue your fitness journey</p>
+                    </div>
+                    <button type="button" class="btn-close position-absolute" style="right: 1rem; top: 1rem;" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm" class="needs-validation" novalidate>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="loginEmail" placeholder="Email address" required>
+                            <label for="loginEmail">Email address</label>
+                            <div class="invalid-feedback">Please enter your email</div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+                            <label for="loginPassword">Password</label>
+                            <div class="invalid-feedback">Please enter your password</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="rememberMe">
+                                <label class="form-check-label" for="rememberMe">Remember me</label>
+                            </div>
+                            <a href="#" class="text-primary">Forgot password?</a>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-3">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Sign In
+                        </button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p class="mb-0">Don't have an account? <a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Register</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="overlay"></div>
+        <!-- Animated Floating Shapes -->
+        <div class="floating-shape shape1"></div>
+        <div class="floating-shape shape2"></div>
+        <div class="container h-100">
+            <div class="row h-100 align-items-center">
+                <div class="col-md-6 text-white animate__animated animate__fadeInLeft">
+                    <h1 class="display-3 fw-bold">Transform Your Body</h1>
+                    <p class="lead">Start your fitness journey today with Click Fit's personalized programs.</p>
+                    <button class="btn btn-primary btn-lg mt-3 pulse-btn">Get Started</button>
+                </div>
+            </div>
+        </div>
+        <!-- Scroll Down Indicator -->
+        <div class="hero-scroll-indicator">
+            <div class="mouse">
+                <div class="mouse-wheel"></div>
+            </div>
+            <span>Scroll Down</span>
+        </div>
+    </section>
+
+    <!-- Daily Fact Section -->
+    <section id="facts" class="py-5 bg-light">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <div class="fitness-fact-accent">
+                        <i class="bi bi-lightbulb"></i>
+                    </div>
+                    <h2 class="fitness-fact-title mb-1">Today's Fitness Fact</h2>
+                    <div class="fitness-fact-bar"></div>
+                    <div class="fitness-fact-card card shadow animate__animated animate__fadeIn">
+                        <div class="card-body" style="background: none; box-shadow: none; border: none; padding: 0;">
+                            <div id="fact-container" class="p-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 fitness-fact-text">Loading today's fact...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="why" class="py-5">
+        <div class="container">
+            <h2 class="section-title">Why Choose Click Fit?</h2>
+            <span class="section-title-accent"></span>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="why-card animate__animated" data-animation="animate__fadeInUp">
+                        <div class="why-accent"></div>
+                        <div class="icon-container">
+                            <i class="bi bi-person-check"></i>
+                        </div>
+                        <h3>Expert Trainers</h3>
+                        <p>Our certified trainers create personalized workout plans to help you achieve your fitness goals.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="why-card animate__animated" data-animation="animate__fadeInUp" data-delay="200">
+                        <div class="why-accent"></div>
+                        <div class="icon-container">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <h3>Flexible Programs</h3>
+                        <p>Choose from a variety of programs designed to fit your schedule and fitness level.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="why-card animate__animated" data-animation="animate__fadeInUp" data-delay="400">
+                        <div class="why-accent"></div>
+                        <div class="icon-container">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3>Track Progress</h3>
+                        <p>Monitor your fitness journey with our advanced tracking tools and regular assessments.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- My Journey Section -->
+    <section id="journey" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title">My Fitness Journey</h2>
+            <span class="section-title-accent"></span>
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <p class="mb-4">Share your transformation photos or workout moments</p>
+                    
+                    <div id="upload-container" class="upload-area mb-4">
+                        <div class="upload-content">
+                            <i class="bi bi-cloud-arrow-up display-4"></i>
+                            <p>Drag & drop images here or click to upload</p>
+                            <input type="file" id="file-input" multiple accept="image/*" class="d-none">
+                        </div>
+                    </div>
+                    
+                    <div id="preview-container" class="row g-3 mt-3">
+                        <!-- Image previews will be added here -->
+                    </div>
+                    
+                    <button id="upload-button" class="btn btn-primary mt-3" disabled>
+                        Upload Images
+                    </button>
+                    
+                    <div id="upload-status" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programs Section -->
+    <section id="programs" class="py-5">
+        <div class="container">
+            <h2 class="section-title">Our Programs</h2>
+            <span class="section-title-accent"></span>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="program-card card h-100">
+                        <span class="badge-popular">Popular</span>
+                        <span class="program-icon-bg"><i class="bi bi-heart-pulse"></i></span>
+                        <div class="card-body text-center">
+                            <span class="program-icon"><i class="bi bi-heart-pulse"></i></span>
+                            <h3>Weight Loss</h3>
+                            <p>Customized programs to help you achieve your weight loss goals through a combination of cardio and strength training.</p>
+                            <button class="btn btn-outline-primary">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="program-card card h-100">
+                        <span class="program-icon-bg"><i class="bi bi-lightning-charge"></i></span>
+                        <div class="card-body text-center">
+                            <span class="program-icon"><i class="bi bi-lightning-charge"></i></span>
+                            <h3>Muscle Building</h3>
+                            <p>Strength-focused programs designed to help you build muscle mass and increase overall strength.</p>
+                            <button class="btn btn-outline-primary">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="program-card card h-100">
+                        <span class="program-icon-bg"><i class="bi bi-activity"></i></span>
+                        <div class="card-body text-center">
+                            <span class="program-icon"><i class="bi bi-activity"></i></span>
+                            <h3>Endurance Training</h3>
+                            <p>Programs focused on improving cardiovascular health and increasing stamina for long-duration activities.</p>
+                            <button class="btn btn-outline-primary">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Stories Section -->
+    <section id="stories" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title">Success Stories</h2>
+            <span class="section-title-accent"></span>
+            
+            <!-- Carousel -->
+            <div id="storiesCarousel" class="carousel slide" data-bs-ride="carousel">
+                <!-- Indicators -->
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#storiesCarousel" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#storiesCarousel" data-bs-slide-to="1"></button>
+                </div>
+
+                <!-- Carousel Inner -->
+                <div class="carousel-inner">
+                    <!-- First Slide -->
+                    <div class="carousel-item active">
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="testimonial-card">
+                        <div class="testimonial-image">
+                                        <img src="images/testimonials/sarah.jpg" alt="Sarah Johnson">
+                                        <div class="achievement-badge">-30 lbs</div>
+                        </div>
+                        <div class="testimonial-content">
+                                        <div class="rating">
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                        </div>
+                                        <p>"Click Fit transformed my life! I lost 30 pounds and gained so much confidence. The trainers are amazing!"</p>
+                            <h5>Sarah Johnson</h5>
+                                        <p class="text-muted">Weight Loss Program</p>
+                                        <div class="progress-stats">
+                                            <div class="stat">
+                                                <span class="stat-value">30</span>
+                                                <span class="stat-label">lbs lost</span>
+                                            </div>
+                                            <div class="stat">
+                                                <span class="stat-value">6</span>
+                                                <span class="stat-label">months</span>
+                                            </div>
+                                        </div>
+                        </div>
+                    </div>
+                </div>
+                            <div class="col-md-4">
+                                <div class="testimonial-card">
+                        <div class="testimonial-image">
+                                        <img src="images/testimonials/michael.jpg" alt="Michael Chen">
+                                        <div class="achievement-badge">+20 lbs</div>
+                        </div>
+                        <div class="testimonial-content">
+                                        <div class="rating">
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                        </div>
+                                        <p>"The muscle building program helped me achieve my dream physique in just 6 months! The results speak for themselves."</p>
+                            <h5>Michael Chen</h5>
+                                        <p class="text-muted">Muscle Building Program</p>
+                                        <div class="progress-stats">
+                                            <div class="stat">
+                                                <span class="stat-value">20</span>
+                                                <span class="stat-label">lbs gained</span>
+                                            </div>
+                                            <div class="stat">
+                                                <span class="stat-value">6</span>
+                                                <span class="stat-label">months</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-image">
+                                        <img src="images/testimonials/jessica.jpg" alt="Jessica Williams">
+                                        <div class="achievement-badge">Marathon</div>
+                                    </div>
+                                    <div class="testimonial-content">
+                                        <div class="rating">
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                        </div>
+                                        <p>"Thanks to Click Fit's endurance program, I completed my first marathon! The training was tough but worth it."</p>
+                                        <h5>Jessica Williams</h5>
+                                        <p class="text-muted">Endurance Training Program</p>
+                                        <div class="progress-stats">
+                                            <div class="stat">
+                                                <span class="stat-value">26.2</span>
+                                                <span class="stat-label">miles</span>
+                                            </div>
+                                            <div class="stat">
+                                                <span class="stat-value">4</span>
+                                                <span class="stat-label">months</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Second Slide -->
+                    <div class="carousel-item">
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-image">
+                                        <img src="images/testimonials/david.jpg" alt="David Rodriguez">
+                                        <div class="achievement-badge">-15% BF</div>
+                                    </div>
+                                    <div class="testimonial-content">
+                                        <div class="rating">
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-half"></i>
+                                        </div>
+                                        <p>"I reduced my body fat by 15% in just 3 months! The nutrition guidance was as valuable as the workouts."</p>
+                                        <h5>David Rodriguez</h5>
+                                        <p class="text-muted">Body Composition Program</p>
+                                        <div class="progress-stats">
+                                            <div class="stat">
+                                                <span class="stat-value">15%</span>
+                                                <span class="stat-label">body fat</span>
+                                            </div>
+                                            <div class="stat">
+                                                <span class="stat-value">3</span>
+                                                <span class="stat-label">months</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-image">
+                                        <img src="images/testimonials/emma.jpg" alt="Emma Thompson">
+                                        <div class="achievement-badge">+50%</div>
+                                    </div>
+                                    <div class="testimonial-content">
+                                        <div class="rating">
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                        </div>
+                                        <p>"My strength increased by 50% in just 4 months! The progressive training program really works."</p>
+                                        <h5>Emma Thompson</h5>
+                                        <p class="text-muted">Strength Training Program</p>
+                                        <div class="progress-stats">
+                                            <div class="stat">
+                                                <span class="stat-value">50%</span>
+                                                <span class="stat-label">strength</span>
+                                            </div>
+                                            <div class="stat">
+                                                <span class="stat-value">4</span>
+                                                <span class="stat-label">months</span>
+                                            </div>
+                                        </div>
+                        </div>
+                    </div>
+                </div>
+                            <div class="col-md-4">
+                                <div class="testimonial-card">
+                        <div class="testimonial-image">
+                                        <img src="images/testimonials/alex.jpg" alt="Alex Kim">
+                                        <div class="achievement-badge">-40 lbs</div>
+                        </div>
+                        <div class="testimonial-content">
+                                        <div class="rating">
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                            <i class="bi bi-star-fill"></i>
+                                        </div>
+                                        <p>"Lost 40 pounds and completely transformed my lifestyle. The support from the Click Fit community was incredible!"</p>
+                                        <h5>Alex Kim</h5>
+                                        <p class="text-muted">Lifestyle Change Program</p>
+                                        <div class="progress-stats">
+                                            <div class="stat">
+                                                <span class="stat-value">40</span>
+                                                <span class="stat-label">lbs lost</span>
+                                            </div>
+                                            <div class="stat">
+                                                <span class="stat-value">8</span>
+                                                <span class="stat-label">months</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#storiesCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#storiesCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5><span class="text-primary">Click</span>Fit</h5>
+                    <p>Your journey to a healthier lifestyle starts here.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Programs</a></li>
+                        <li><a href="#" class="text-white">Trainers</a></li>
+                        <li><a href="#" class="text-white">Nutrition</a></li>
+                        <li><a href="#" class="text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Connect With Us</h5>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-center">
+                    <p class="mb-0">&copy; 2023 ClickFit. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
